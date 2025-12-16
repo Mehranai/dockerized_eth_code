@@ -18,12 +18,12 @@ pub struct AppConfig {
 impl AppConfig {
     pub fn default() -> Self {
         Self {
-            clickhouse_url: "http://localhost:8123".into(),
+            clickhouse_url: std::env::var("CLICKHOUSE_URL").into(),
             clickhouse_user: "mehran".into(),
             clickhouse_pass: "mehran.crypto9".into(),
             clickhouse_db_eth: "eth_database".into(),
             clickhouse_db_btc: "btc_database".into(),
-            eth_rpc_url: "https://rpc.ankr.com/eth/<Klid>".into(),
+            eth_rpc_url: std::env::var("ETH_RPC_HTTP").into(),
             btc_api_url: "https://blockstream.info/api".into(),
             btc_start_block: 831000,
             eth_start_block: 19000000,
