@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    networks:
+      - blockchain-net
+    volumes:
+      - ./ch-data:/var/lib/clickhouse
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+
+  rust-app:
+    build: .
+    container_name: eth-app
+    networks:
+      - blockchain-net
+    depends_on:
+      - clickhouse
+    environment:
+      ETH_RPC_HTTP: http://reth-node:8545
+      ETH_RPC_WS: ws://reth-node:8546
+      CLICKHOUSE_URL: http://clickhouse:8123
+
+networks:
+  blockchain-net:
+    external: true
