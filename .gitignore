@@ -1,0 +1,13 @@
+# Rust
+target/
+**/target/
+**/*.rs.bk
+
+# Docker Data
+**/reth-data/
+**/bitcoin-data/
+
+# OS / Editor
+.DS_Store
+.idea/
+.vscode/

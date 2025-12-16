@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  reth:
+    image: ghcr.io/paradigmxyz/reth:latest
+    container_name: reth-node
+    networks:
+      - blockchain-net
+    volumes:
+      - ./reth-data:/data/reth
+    ports:
+      - "8545:8545"
+      - "8546:8546"
+    command:
+      [
+        "node",
+        "--datadir", "/data/reth",
+        "--http",
+        "--ws",
+        "--http.api", "all",
+        "--ws.api", "all"
+      ]
+
+networks:
+  blockchain-net:
+    external: true
