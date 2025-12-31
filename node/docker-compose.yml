@@ -3,23 +3,56 @@ version: "3.8"
 services:
   reth:
     image: ghcr.io/paradigmxyz/reth:latest
-    container_name: reth-node
-    networks:
-      - blockchain-net
+    container_name: reth
+    command:
+      - node
+      - --chain=mainnet
+      - --datadir=/data
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.api=eth,net,web3,debug,trace
+      - --authrpc.addr=0.0.0.0
+      - --authrpc.port=8551
+      - --authrpc.jwtsecret=/jwt/jwt.hex
     volumes:
-      - ./reth-data:/data/reth
+      - ./data/reth:/data
+      - ./jwt:/jwt
     ports:
       - "8545:8545"
-      - "8546:8546"
+      - "30303:30303"
+      - "30303:30303/udp"
+    restart: unless-stopped
+    networks:
+      - blockchain-net
+
+  prysm:
+    image: gcr.io/prysmaticlabs/prysm/beacon-chain:stable
+    container_name: prysm
     command:
-      [
-        "node",
-        "--datadir", "/data/reth",
-        "--http",
-        "--ws",
-        "--http.api", "all",
-        "--ws.api", "all"
-      ]
+      - --mainnet
+      - --datadir=/data
+      - --execution-endpoint=http://reth:8551
+      - --jwt-secret=/jwt/jwt.hex
+      - --checkpoint-sync-url=https://beaconstate.info
+      - --accept-terms-of-use
+      - --grpc-gateway-host=0.0.0.0
+      - --grpc-gateway-port=3500
+      - --monitoring-host=0.0.0.0
+      - --monitoring-port=8080
+    volumes:
+      - ./data/prysm:/data
+      - ./jwt:/jwt
+    depends_on:
+      - reth
+    ports:
+      - "3500:3500"   # Beacon API
+      - "8080:8080"   # Metrics
+      - "13000:13000"
+      - "12000:12000/udp"
+    restart: unless-stopped
+    networks:
+      - blockchain-net
 
 networks:
   blockchain-net:

@@ -1,5 +1,5 @@
 [package]
-name = "arz_axum_for_eth"
+name = "arz_axum_for_services"
 version = "0.1.0"
 edition = "2024"
 
@@ -8,7 +8,7 @@ anyhow = "1.0.100"
 axum = "0.8.7"
 bitcoincore-rpc = "0.19.0"
 chrono = { version = "0.4.42", features = ["serde"] }
-clickhouse = "0.14.0"
+clickhouse = { version = "0.14.1" , features= ["native-tls"]}
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
 thiserror = "2.0.17"

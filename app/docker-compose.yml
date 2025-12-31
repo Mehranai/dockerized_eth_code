@@ -2,28 +2,43 @@ version: "3.8"
 
 services:
   clickhouse:
-    image: clickhouse/clickhouse-server:latest
+    image: clickhouse/clickhouse-server:23.8
     container_name: clickhouse
-    networks:
-      - blockchain-net
     volumes:
       - ./ch-data:/var/lib/clickhouse
     ports:
       - "8123:8123"
       - "9000:9000"
+    environment:
+      CLICKHOUSE_USER: admin
+      CLICKHOUSE_PASSWORD: mehran.admin
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
 
   rust-app:
     build: .
-    container_name: eth-app
-    networks:
-      - blockchain-net
+    container_name: rust-app
     depends_on:
       - clickhouse
     environment:
-      ETH_RPC_HTTP: http://reth-node:8545
-      ETH_RPC_WS: ws://reth-node:8546
-      CLICKHOUSE_URL: http://clickhouse:8123
+      APP_MODE: ${APP_MODE}
 
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_USER: admin
+      CLICKHOUSE_PASSWORD: mehran.admin
+
+      CLICKHOUSE_DB_BTC: btc_db
+      CLICKHOUSE_DB_ETH: eth_db
+
+      BTC_API_URL: https://blockstream.info/api
+      BTC_START_BLOCK: 831000
+      TOTAL_BTC_TXS: 500
+
+      ETH_RPC_HTTP: https://rpc.ankr.com/eth/a4ce905377a7aa94ded62bf6efb50b20acde76159d163f8de77a16ec6237137b
+      #ETH_RPC_HTTP: http://reth:8545
+      ETH_START_BLOCK: 19000000
+      TOTAL_ETH_TXS: 300
+    networks:
+      - blockchain-net
 networks:
   blockchain-net:
-    external: true
+    name: blockchain-net

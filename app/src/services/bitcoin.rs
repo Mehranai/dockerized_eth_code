@@ -76,11 +76,34 @@ async fn get_block_hash_by_height(base_url: &str, height: u64) -> Result<String>
     Ok(reqwest::get(&url).await?.text().await?.trim().to_string())
 }
 
-async fn get_block_txs(base_url: &str, block_hash: &str) -> Result<Vec<BlockTx>> {
-    let url = format!("{}/block/{}/txs", base_url, block_hash);
-    let resp = reqwest::get(&url).await?;
-    let body_text = resp.text().await?;
-    let txs_page: Vec<BlockTx> = serde_json::from_str(&body_text)?;
+async fn get_block_txs(base_url: &str,block_hash: &str) -> Result<Vec<BlockTx>> {
+    let mut all_txs = Vec::new();
+    let mut last_seen_txid: Option<String> = None;
 
-    Ok(txs_page)
+    loop {
+        let url = match &last_seen_txid {
+            Some(txid) => format!(
+                "{}/block/{}/txs/{}",
+                base_url, block_hash, txid
+            ),
+            None => format!(
+                "{}/block/{}/txs",
+                base_url, block_hash
+            ),
+        };
+
+        let resp = reqwest::get(&url).await?;
+        let body_text = resp.text().await?;
+
+        let txs: Vec<BlockTx> = serde_json::from_str(&body_text)?;
+
+        if txs.is_empty() {
+            break;
+        }
+
+        last_seen_txid = Some(txs.last().unwrap().txid.clone());
+        all_txs.extend(txs);
+    }
+
+    Ok(all_txs)
 }

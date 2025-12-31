@@ -1,15 +1,15 @@
-CREATE DATABASE IF NOT EXISTS btc_database;
+CREATE DATABASE IF NOT EXISTS btc_db;
 
-CREATE TABLE IF NOT EXISTS btc_database.wallet_info (
+CREATE TABLE IF NOT EXISTS btc_db.wallet_info (
     address String,
     balance String,
     nonce UInt64,
     type String,
-    person_id String,
+    person_id String
 ) ENGINE = ReplacingMergeTree()
 ORDER BY address;
 
-CREATE TABLE IF NOT EXISTS btc_database.transactions (
+CREATE TABLE IF NOT EXISTS btc_db.transactions (
     hash String,
     block_number UInt64,
     from_addr String,
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS btc_database.transactions (
 ) ENGINE = MergeTree()
 ORDER BY block_number;
 
-CREATE TABLE IF NOT EXISTS btc_database.owner_info (
+CREATE TABLE IF NOT EXISTS btc_db.owner_info (
     address String,
     person_name String,
     person_id String,

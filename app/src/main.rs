@@ -1,29 +1,27 @@
-use tokio;
 use anyhow::Result;
-use arz_axum_for_bitcoin::config::AppConfig;
-use arz_axum_for_bitcoin::tasks::fetch_loop::{run_btc_loop};
+use tokio;
 
-// Axum Section
-//use arz_axum_for_bitcoin::router::build_router;
-
+use arz_axum_for_services::config::{AppConfig, AppMode};
+use arz_axum_for_services::tasks::fetch_loop::{
+    run_btc_loop,
+    run_eth_loop,
+};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    
-    let config = AppConfig::default();
 
-    let fetch_handle = tokio::spawn({
-        let config = config.clone();
-        async move { run_btc_loop(config).await.unwrap(); }
-    });
+    //Testing Evn inputs
+    //println!("{:?}", std::env::vars().collect::<Vec<_>>());
+    let config = AppConfig::from_env();
 
-    fetch_handle.await.unwrap();
+    match config.mode {
+        AppMode::Btc => {
+            run_btc_loop(config).await?;
+        }
+        AppMode::Eth => {
+            run_eth_loop(config).await?;
+        }
+    }
+
     Ok(())
-
-    // Axum Section Skip
-    // let app = router::create(state);
-    // axum::Server::bind(&cfg.bind_addr)
-    //     .serve(app.into_make_service())
-    //     .await
-    //     .unwrap();
 }
