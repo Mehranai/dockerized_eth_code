@@ -12,8 +12,19 @@ docker network create blockchain-net
 ```command
 cd node
 docker compose up -d
-docker logs -f reth-node
+docker logs -f reth
+docker logs -f prysm
 ```
+
+### Outputs for Prysm:
+    ✔ Connected to execution client
+    ✔ Checkpoint sync started
+    ✔ Beacon chain syncing
+
+### Outputs for Reth:
+    Consensus client connected
+
+
 ## Run ETH App + Clickhouse
 
 ```command
